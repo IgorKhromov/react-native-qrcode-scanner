@@ -12,7 +12,6 @@ import {
 
 import Camera from 'react-native-camera'
 
-
 export default class QRCodeScanner extends Component {
   static propTypes = {
     onRead: PropTypes.func.isRequired,
@@ -22,6 +21,8 @@ export default class QRCodeScanner extends Component {
     showMarker: PropTypes.bool,
     customMarker: PropTypes.element,
     cameraStyle: PropTypes.any,
+    mainContainerStyle: PropTypes.any,
+    cameraProps: PropTypes.object,
     topViewStyle: PropTypes.any,
     bottomViewStyle: PropTypes.any,
     topContent: PropTypes.oneOfType([
@@ -40,6 +41,7 @@ export default class QRCodeScanner extends Component {
     reactivateTimeout: 0,
     fadeIn: true,
     showMarker: false,
+    cameraProps: {}
   }
 
   constructor(props) {
@@ -57,15 +59,15 @@ export default class QRCodeScanner extends Component {
       Animated.sequence([
         Animated.delay(1000),
         Animated.timing(
-         this.state.fadeInOpacity,
-         {
-           toValue: 1,
-           easing: Easing.inOut(Easing.quad),
-         },
+          this.state.fadeInOpacity,
+          {
+            toValue: 1,
+            easing: Easing.inOut(Easing.quad),
+          },
         )
       ]).start();
     }
-   }
+  }
 
   _setScanning(value) {
     this.setState({ scanning: value });
@@ -99,9 +101,9 @@ export default class QRCodeScanner extends Component {
   _renderCameraMarker() {
     if (this.props.showMarker) {
       return (
-      <View style={styles.rectangleContainer}>
-        <View style={styles.rectangle}/>
-      </View>
+        <View style={styles.rectangleContainer}>
+          <View style={styles.rectangle}/>
+        </View>
       )
     }
     return null;
@@ -114,24 +116,31 @@ export default class QRCodeScanner extends Component {
           style={{
             opacity: this.state.fadeInOpacity,
             backgroundColor: 'transparent'
-        }}>
-          <Camera style={[styles.camera, this.props.cameraStyle]} onBarCodeRead={this._handleBarCodeRead.bind(this)}>
+          }}>
+          <Camera
+            style={[styles.camera, this.props.cameraStyle]}
+            {...this.props.cameraProps}
+            onBarCodeRead={this._handleBarCodeRead.bind(this)}
+          >
             {this._renderCameraMarker()}
           </Camera>
         </Animated.View>
       )
     }
     return (
-      <Camera style={styles.camera} onBarCodeRead={this._handleBarCodeRead.bind(this)}>
+      <Camera
+        style={[styles.camera, this.props.cameraStyle]}
+        {...this.props.cameraProps}
+        onBarCodeRead={this._handleBarCodeRead.bind(this)}
+      >
         {this._renderCameraMarker()}
       </Camera>
     )
   }
 
-
   render() {
     return (
-      <View style={styles.mainContainer}>
+      <View style={[styles.mainContainer, this.props.mainContainerStyle]}>
         <View style={[styles.infoView, this.props.topViewStyle]}>
           {this._renderTopContent()}
         </View>
@@ -160,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
-    height: Dimensions.get('window').width,
+    height: Dimensions.get('window').height,
     width: Dimensions.get('window').width,
   },
 
